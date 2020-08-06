@@ -1,0 +1,33 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Algo"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="Algo.MainWindow"
+        mc:Ignorable="d"
+        Title="AlgoShowcase" Height="450" Width="800">
+    <Grid>
+        <Border BorderBrush="Black" BorderThickness="1" Height="229" Margin="10,26,10,0" VerticalAlignment="Top">
+            <Canvas x:Name="canv"/>
+        </Border>
+        <Button Content="Visualize" Height="61" Margin="0,285,10,0" VerticalAlignment="Top" Click="Button_Click" IsCancel="True" Foreground="White" Background="#FF686868" BorderBrush="{x:Null}" FontWeight="Bold" FontSize="14" HorizontalAlignment="Right" Width="194"/>
+        <Slider x:Name="numslider" HorizontalAlignment="Left" Height="34" Margin="12,285,0,0" VerticalAlignment="Top" Width="163" Interval="10" Minimum="10" Maximum="200" TickPlacement="BottomRight" TickFrequency="10" IsSnapToTickEnabled="True"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Height="25" Margin="12,350,0,0" VerticalAlignment="Top" Width="107">
+            <ComboBoxItem>Merge sort</ComboBoxItem>
+            <ComboBoxItem>Insertion sort</ComboBoxItem>
+            <ComboBoxItem>Quicksort</ComboBoxItem>
+            <ComboBoxItem>Bubble sort</ComboBoxItem>
+            <ComboBoxItem>Selection sort</ComboBoxItem>
+        </ComboBox>
+        <Label Content="Amount of numbers:" HorizontalAlignment="Left" Margin="12,260,0,0" VerticalAlignment="Top"/>
+        <Label Content="Algorithm:" HorizontalAlignment="Left" Margin="12,319,0,0" VerticalAlignment="Top"/>
+        <Slider x:Name="speedSlider" HorizontalAlignment="Left" Height="35" Margin="288,285,0,0" VerticalAlignment="Top" Width="188" Minimum="5" Maximum="45" Value="25" SmallChange="1" IsDirectionReversed="True"/>
+        <Label Content="Animation Speed:" HorizontalAlignment="Left" Margin="288,260,0,0" VerticalAlignment="Top" RenderTransformOrigin="-3.171,-0.212"/>
+        <Label Content="slow" HorizontalAlignment="Left" Margin="274,302,0,0" VerticalAlignment="Top" Height="27"/>
+        <Label Content="fast" HorizontalAlignment="Left" Margin="457,301,0,0" VerticalAlignment="Top" Height="27"/>
+        <Button x:Name="pauseButton" Content="Pause" HorizontalAlignment="Right" Height="33" Margin="0,333,306,0" VerticalAlignment="Top" Width="43" Click="pauseButton_Click" Background="#FF686868" Foreground="White" BorderBrush="{x:Null}" FontWeight="Bold"/>
+        <TextBox x:Name="txtbox" HorizontalAlignment="Left" Height="19" Margin="422,375,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="132"/>
+
+    </Grid>
+</Window>
