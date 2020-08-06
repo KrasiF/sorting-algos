@@ -82,7 +82,7 @@ namespace Algo
                     MessageBox.Show("You need to select an algorithm.", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
-            txtbox.Text = comparisons.ToString();
+            txtBlock.Text = comparisons.ToString();
 
         }
 
