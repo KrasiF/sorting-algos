@@ -21,12 +21,21 @@ namespace Algo
     /// </summary>
     public partial class MainWindow : Window
     {
+        //current array of numbers (the one being shown)
         int[] arr;
+        //currently highlighted indexes
         int[] selectedArr;
+        //all sorting steps (arrays of numbers)
         List<int[]> sortHistory;
+        //all highlighted indexes
         List<int[]> selectedHistory;
         DispatcherTimer timer;
+
+        //how many comparisons were needed for the sort in total
         long comparisons;
+
+        //how many array accesses were needed for the sort
+        long arrAccesses;
 
         public MainWindow()
         {
@@ -36,12 +45,15 @@ namespace Algo
 
         void Button_Click(object sender, RoutedEventArgs e)
         {
+            //initialize everything
             if (timer != null) { timer.Stop(); }
             selectedHistory = new List<int[]>();
             sortHistory = new List<int[]>();
             isPaused = false;
             comparisons = 0;
+            arrAccesses = 0;
 
+            //create a random starting array
             Random random = new Random();
             arr = new int[(int)numslider.Value];
             for (int i = 0; i < arr.Length; i++)
@@ -78,12 +90,23 @@ namespace Algo
                     SelectionSort();
                     DrawHistory();
                     break;
+                case 5:
+                    HeapSort();
+                    DrawHistory();
+                    break;
                 default:
                     MessageBox.Show("You need to select an algorithm.", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
-            txtBlock.Text = comparisons.ToString();
+            comparisonsTxt.Text = comparisons.ToString();
+            arrayAccTxt.Text = arrAccesses.ToString();
 
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (arr != null)
+                DrawNumbers(arr, selectedArr);
         }
 
         void AddHistorySnap()
@@ -94,26 +117,6 @@ namespace Algo
             selectedHistory.Add(selectedArr);
         }
 
-        void DrawLines(int[] arr, int[] selectedIndexes)
-        {
-            canv.Children.Clear();
-
-
-            int howMany = (int)arr.Length;
-            double size = canv.ActualWidth / howMany;
-
-            for (int i = 0; i < howMany; i++)
-            {
-                Line liniika = new Line();
-                liniika.Stroke = new SolidColorBrush(selectedIndexes.Contains(i) ? Colors.Red : Colors.Black);
-                liniika.StrokeThickness = 2;
-                liniika.X1 = size / 2 + i * size;
-                liniika.X2 = size / 2 + i * size;
-                liniika.Y2 = canv.ActualHeight - (canv.ActualHeight - 10) / howMany * arr[i];
-                liniika.Y1 = canv.ActualHeight;
-                canv.Children.Add(liniika);
-            }
-        }
         void DrawNumbers(int[] arr, int[] selectedHistory)
         {
             canv.Children.Clear();
@@ -129,7 +132,7 @@ namespace Algo
                 Canvas.SetBottom(rect, 0);
                 rect.Width = size;
                 rect.Height = (canv.ActualHeight - 5) / howMany * arr[i];
-                if (selectedHistory.Contains(i) || (i < selectedHistory.Max() && i > selectedHistory.Min() ))
+                if (selectedHistory.Contains(i))
                 {
                     rect.Fill = new SolidColorBrush(Colors.Red);
                 }
@@ -148,6 +151,8 @@ namespace Algo
             timer.Tick += (sender, e) =>
             {
                 timer.Stop();
+                arr = sortHistory[counter];
+                selectedArr = selectedHistory[counter];
                 DrawNumbers(sortHistory[counter], selectedHistory[counter]);
                 counter++;
                 if (counter < sortHistory.Count)
@@ -164,6 +169,7 @@ namespace Algo
             int length = endI - startI;
             if (length == 1)
             {
+                arrAccesses++;
                 return new int[] { arr[startI] };
             }
             int[] A = MergeSort(startI, startI + length / 2);
@@ -173,21 +179,29 @@ namespace Algo
             int iB = 0;
 
             for (int i = 0; i < AB.Length; i++)
-            {
+            {                                
+
+                arrAccesses += 4;
+
                 comparisons++;
-                if (iB < B.Length && (iA == A.Length || B[iB] < A[iA]))
+                if (B[iB] < A[iA] || iA == A.Length)
                 {
+                    if(B[iB] >= A[iA])
+                    {
+                        comparisons++;
+                    }
                     AB[i] = B[iB];
                     arr[startI + i] = B[iB];
                     iB++;
                 }
                 else
                 {
+                    comparisons++;
                     AB[i] = A[iA];
                     arr[startI + i] = A[iA];
                     iA++;
                 }
-                selectedArr = new int[] { startI+i};
+                selectedArr = new int[] { startI + i };
                 AddHistorySnap();
             }
 
@@ -201,13 +215,21 @@ namespace Algo
                 int curr = i;
                 while (curr - 1 >= 0 && arr[curr - 1] > arr[curr])
                 {
-                    comparisons++;
+                    arrAccesses += 6;
+
+                    comparisons += 2;
                     int oldIValue = arr[curr];
                     arr[curr] = arr[curr - 1];
                     arr[curr - 1] = oldIValue;
                     curr--;
                 }
+
                 comparisons++;
+                if (curr - 1 >= 0)
+                { 
+                    comparisons++; 
+                }
+
                 selectedArr = new int[] { curr };
                 AddHistorySnap();
             }
@@ -215,6 +237,7 @@ namespace Algo
 
         void QuickSort(int startI, int endI)
         {
+            comparisons++;
             if (endI - startI < 1)
                 return;
 
@@ -226,24 +249,29 @@ namespace Algo
             while (j < endI - 1)
             {
                 comparisons++;
+                arrAccesses += 2;
                 if (arr[j] <= arr[pI])
                 {
+                    comparisons++;
+                    arrAccesses += 4;
                     int oldJ = arr[j];
                     arr[j] = arr[i];
                     arr[i] = oldJ;
                     i++;
-                    selectedArr = new int[] { j,i };
+                    selectedArr = new int[] { j, i };
                     AddHistorySnap();
                 }
                 j++;
             }
+            comparisons++;
 
             int oldI = arr[i];
             arr[i] = arr[pI];
             arr[pI] = oldI;
             pI = i;
+            arrAccesses += 4;
 
-            selectedArr = new int[] { pI,i };
+            selectedArr = new int[] { pI, i };
             AddHistorySnap();
 
             QuickSort(startI, pI);
@@ -261,6 +289,8 @@ namespace Algo
                         int oldJ = arr[j];
                         arr[j] = arr[j + 1];
                         arr[j + 1] = oldJ;
+                        arrAccesses += 6;
+
                     }
                     comparisons++;
                 }
@@ -281,21 +311,78 @@ namespace Algo
                     {
                         minI = j;
                     }
+                    arrAccesses += 2;
                     comparisons++;
                 }
                 int oldI = arr[i];
                 arr[i] = arr[minI];
                 arr[minI] = oldI;
-                AddHistorySnap();
+                arrAccesses += 4;
                 selectedArr = new int[] { i };
+                AddHistorySnap();
 
             }
         }
 
-        void Button_Click_1(object sender, RoutedEventArgs e)
+        void HeapSort()
         {
 
+            for (int i = arr.Length / 2 - 1; i >= 0; i--)
+            {
+                Heapify(i, arr.Length);
+            }
 
+            for (int i = arr.Length - 1; i >= 0; i--)
+            {
+                int oldI = arr[i];
+                arr[i] = arr[0];
+                arr[0] = oldI;
+                arrAccesses += 4;
+                Heapify(0, i);
+            }
+
+            selectedArr = new int[] { arr.Length-1 };
+
+            AddHistorySnap();
+
+            void Heapify(int i, int topI)
+            {
+                int maxI = i;
+                int leftChildI = i * 2 + 1;
+                int rightChildI = i * 2 + 2;
+
+                comparisons++;
+                if (leftChildI < topI)
+                {
+                    arrAccesses += 2;
+                    comparisons++;
+                    if (arr[leftChildI] > arr[maxI])
+                        maxI = leftChildI;
+                }
+
+                comparisons++;
+                if (rightChildI < topI)
+                {
+                    arrAccesses += 2;
+                    comparisons++;
+                    if (arr[rightChildI] > arr[maxI])
+                        maxI = rightChildI;
+                }
+
+                comparisons++;
+                if (maxI != i)
+                {
+                    int oldI = arr[i];
+                    arr[i] = arr[maxI];
+                    arr[maxI] = oldI;
+
+                    arrAccesses += 4;
+
+                    selectedArr = new int[] { i };
+                    AddHistorySnap();
+                    Heapify(maxI, topI);
+                }
+            }
         }
 
         bool isPaused = false;

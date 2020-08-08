@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Algo"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="Algo.MainWindow"
         mc:Ignorable="d"
-        Title="AlgoShowcase" Height="453" Width="710" MinWidth="710" MinHeight="360">
+        Title="AlgoShowcase" Height="453" Width="710" MinWidth="710" MinHeight="360" SizeChanged="Window_SizeChanged">
     <Grid>
         <Border BorderBrush="Black" BorderThickness="1" Margin="10,26,10,188">
             <Canvas x:Name="canv"/>
@@ -19,6 +19,7 @@
             <ComboBoxItem>Quicksort</ComboBoxItem>
             <ComboBoxItem>Bubble sort</ComboBoxItem>
             <ComboBoxItem>Selection sort</ComboBoxItem>
+            <ComboBoxItem>Heapsort</ComboBoxItem>
         </ComboBox>
         <Label Content="Amount of numbers:" HorizontalAlignment="Left" Margin="12,0,0,133" Height="26" VerticalAlignment="Bottom"/>
         <Label Content="Algorithm:" HorizontalAlignment="Left" Margin="12,0,0,74" Height="26" VerticalAlignment="Bottom"/>
@@ -28,7 +29,9 @@
         <Label Content="fast" Margin="0,0,10,44" Height="27" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="29"/>
         <Button x:Name="pauseButton" Content="Pause" Margin="0,0,10,10" Click="pauseButton_Click" Background="#FF686868" Foreground="White" BorderBrush="{x:Null}" FontWeight="Bold" HorizontalAlignment="Right" Width="42" Height="33" VerticalAlignment="Bottom"/>
         <TextBlock HorizontalAlignment="Left" Margin="188,0,0,133" TextWrapping="Wrap" Text="Number of comparisons:" Width="136" Height="21" VerticalAlignment="Bottom"/>
-        <TextBlock x:Name="txtBlock" HorizontalAlignment="Left" Margin="320,0,0,133" TextWrapping="Wrap" Text="?" Width="147" FontWeight="Bold" Height="21" VerticalAlignment="Bottom"/>
+        <TextBlock x:Name="comparisonsTxt" HorizontalAlignment="Left" Margin="333,0,0,133" TextWrapping="Wrap" Text="?" Width="147" FontWeight="Bold" Height="21" VerticalAlignment="Bottom"/>
+        <TextBlock HorizontalAlignment="Left" Margin="188,0,0,113" TextWrapping="Wrap" Text="Number of array accesses:" Width="147" Height="21" VerticalAlignment="Bottom"/>
+        <TextBlock x:Name="arrayAccTxt" HorizontalAlignment="Left" Margin="333,0,0,113" TextWrapping="Wrap" Text="?" Width="147" FontWeight="Bold" Height="21" VerticalAlignment="Bottom"/>
 
     </Grid>
 </Window>
