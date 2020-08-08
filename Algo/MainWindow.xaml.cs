@@ -184,9 +184,10 @@ namespace Algo
                 arrAccesses += 4;
 
                 comparisons++;
-                if (B[iB] < A[iA] || iA == A.Length)
+                if ( iB < B.Length && (iA == A.Length || B[iB] < A[iA]))
                 {
-                    if(B[iB] >= A[iA])
+                    comparisons++;
+                    if (iA != A.Length)                    
                     {
                         comparisons++;
                     }
@@ -196,7 +197,11 @@ namespace Algo
                 }
                 else
                 {
-                    comparisons++;
+                    if(iB < B.Length)
+                    {
+                        comparisons += 2;
+                    }
+
                     AB[i] = A[iA];
                     arr[startI + i] = A[iA];
                     iA++;
