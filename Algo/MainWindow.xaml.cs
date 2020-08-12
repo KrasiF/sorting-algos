@@ -21,15 +21,26 @@ namespace Algo
     /// </summary>
     public partial class MainWindow : Window
     {
+        //bool for the pause button && extra functionallity
+        bool isPaused;
+
         //current array of numbers (the one being shown)
         int[] arr;
+
         //currently highlighted indexes
         int[] selectedArr;
+
         //all sorting steps (arrays of numbers)
         List<int[]> sortHistory;
-        //all highlighted indexes
+
+        //all highlighted indexes during the sorting steps
         List<int[]> selectedHistory;
+
+        //timer that we'll use when drawing the array
         DispatcherTimer timer;
+
+        //for custom arrays
+        bool isPremade;
 
         //how many comparisons were needed for the sort in total
         long comparisons;
@@ -40,33 +51,39 @@ namespace Algo
         public MainWindow()
         {
             InitializeComponent();
+            arr = new int[(int)numslider.Value];
         }
 
 
-        void Button_Click(object sender, RoutedEventArgs e)
+        void Visualize_Click(object sender, RoutedEventArgs e)
         {
             //initialize everything
             if (timer != null) { timer.Stop(); }
-            selectedHistory = new List<int[]>();
-            sortHistory = new List<int[]>();
             isPaused = false;
             comparisons = 0;
             arrAccesses = 0;
+            selectedHistory = new List<int[]>();
+            sortHistory = new List<int[]>();
+            ResetPauseButtonText();
 
-            //create a random starting array
-            Random random = new Random();
-            arr = new int[(int)numslider.Value];
-            for (int i = 0; i < arr.Length; i++)
+            //create a random starting array, if its not already premade
+            if (!isPremade)
             {
-                arr[i] = i + 1;
+                Random random = new Random();
+                arr = new int[(int)numslider.Value];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = i + 1;
+                }
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    int oldArrItem = arr[i];
+                    int switchIndex = random.Next(i, arr.Length);
+                    arr[i] = arr[switchIndex];
+                    arr[switchIndex] = oldArrItem;
+                }
             }
-            for (int i = 0; i < arr.Length; i++)
-            {
-                int oldArrItem = arr[i];
-                int switchIndex = random.Next(i, arr.Length);
-                arr[i] = arr[switchIndex];
-                arr[switchIndex] = oldArrItem;
-            }
+            isPremade = false;
 
             switch (comboBox.SelectedIndex)
             {
@@ -98,9 +115,84 @@ namespace Algo
                     MessageBox.Show("You need to select an algorithm.", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
             }
+
             comparisonsTxt.Text = comparisons.ToString();
             arrayAccTxt.Text = arrAccesses.ToString();
+            numsTxt.Text = numslider.Value.ToString();
 
+        }
+
+        bool isLeftButtonDown;
+        private void canv_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isLeftButtonDown = true;            
+        }
+
+        private void canv_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isLeftButtonDown && isPaused && (e.GetPosition(canv).X > 0 && e.GetPosition(canv).X < canv.ActualWidth) && (e.GetPosition(canv).Y > 0 && e.GetPosition(canv).Y < canv.ActualHeight))
+            {
+                isPremade = true;
+                Point a = Mouse.GetPosition(canv);
+                arr[(int)Math.Ceiling(a.X / (canv.ActualWidth / arr.Length)) - 1] = arr.Length - (int)Math.Ceiling(a.Y / (canv.ActualHeight / arr.Length));
+                DrawNumbers(arr, null);
+            }
+            else
+            {
+                isLeftButtonDown = false;
+            }
+        }
+
+        private void window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            isLeftButtonDown = false;
+        }
+
+        private void pauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (isPremade)
+            {
+                MessageBox.Show("To visualize a premade array click \"Visualize\"", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            if (timer == null)
+            {
+                MessageBox.Show("There is no running preview.", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            if (isPaused)
+            {
+                PlayPreview();
+            }
+            else
+            {
+                PausePreview();
+            }
+        }
+
+        private void PausePreview()
+        {
+            if(timer != null)
+            {
+                timer.Stop();
+            }
+            pauseButton.Content = "Play";
+            isPaused = true;
+        }
+
+        private void PlayPreview()
+        {
+            if (timer != null)
+            {
+                timer.Start();
+            }
+            pauseButton.Content = "Pause";
+            isPaused = false;
+        }   
+
+        private void ResetPauseButtonText()
+        {
+            pauseButton.Content = "Pause";
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -121,7 +213,6 @@ namespace Algo
         {
             canv.Children.Clear();
 
-
             int howMany = (int)arr.Length;
             double size = canv.ActualWidth / howMany;
 
@@ -132,7 +223,7 @@ namespace Algo
                 Canvas.SetBottom(rect, 0);
                 rect.Width = size;
                 rect.Height = (canv.ActualHeight - 5) / howMany * arr[i];
-                if (selectedHistory.Contains(i))
+                if (selectedHistory != null && selectedHistory.Contains(i))
                 {
                     rect.Fill = new SolidColorBrush(Colors.Red);
                 }
@@ -160,6 +251,12 @@ namespace Algo
                     timer.Interval = TimeSpan.FromMilliseconds(speedSlider.Value);
                     timer.Start();
                 }
+                else
+                {
+                    isPaused = true;
+                    timer = null;
+                    ResetPauseButtonText();
+                }
             };
             timer.Start();
         }
@@ -179,15 +276,14 @@ namespace Algo
             int iB = 0;
 
             for (int i = 0; i < AB.Length; i++)
-            {                                
+            {
 
                 arrAccesses += 4;
-
                 comparisons++;
-                if ( iB < B.Length && (iA == A.Length || B[iB] < A[iA]))
+                if (iB < B.Length && (iA == A.Length || B[iB] < A[iA]))
                 {
                     comparisons++;
-                    if (iA != A.Length)                    
+                    if (iA != A.Length)
                     {
                         comparisons++;
                     }
@@ -197,7 +293,7 @@ namespace Algo
                 }
                 else
                 {
-                    if(iB < B.Length)
+                    if (iB < B.Length)
                     {
                         comparisons += 2;
                     }
@@ -231,8 +327,8 @@ namespace Algo
 
                 comparisons++;
                 if (curr - 1 >= 0)
-                { 
-                    comparisons++; 
+                {
+                    comparisons++;
                 }
 
                 selectedArr = new int[] { curr };
@@ -346,7 +442,7 @@ namespace Algo
                 Heapify(0, i);
             }
 
-            selectedArr = new int[] { arr.Length-1 };
+            selectedArr = new int[] { arr.Length - 1 };
 
             AddHistorySnap();
 
@@ -390,24 +486,6 @@ namespace Algo
             }
         }
 
-        bool isPaused = false;
-        private void pauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (isPaused)
-            {
-                timer.Start();
-                pauseButton.Content = "Pause";
-                isPaused = false;
-            }
-            else
-            {
-                if (timer != null)
-                {
-                    pauseButton.Content = "Play";
-                    timer.Stop();
-                    isPaused = true;
-                }
-            }
-        }
+        
     }
 }
