@@ -8,7 +8,9 @@ A simple WPF app for visualizing sorting algorithms (and possibly comparing them
 Additional functionallity:
 * You can pause / unpause the preview using the button
 * You can speed up / slow down the preview using the slider
+![preview1](src/preview1.gif)
+
 * After the first visualization you can pause the preview and change the numbers just by clicking and holding on the display
   * After drawing you can start the showcase and sort the numbers with "Visualize".
-  * You can change the algorithm before visualizing.
-  
+  * You can change the algorithm before visualizing. 
+![preview2](src/preview2.gif)
